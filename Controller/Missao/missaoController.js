@@ -1,17 +1,18 @@
 const express = require("express");
 const app = express();
-const pool = require('../../dataBase/connection.js');
+// const pool = require('../../dataBase/connection');
+const Missoes = require('../../models/missoes');
 
 app.post('/missao', async (req, res) => {
     try {
-        const { titulo, descricao } = req.body;
+        const dadosCadastroMissoes = req.body;
         const dataAtual = new Date().toISOString();
-        const [rows] = await pool.execute(
-            'INSERT INTO missoes (titulo, descricao, data) VALUES (?, ?, ?)',
-            [titulo, descricao, dataAtual]
-        );
+        const dataFormatada = dataAtual.split('T')[0];
+        dadosCadastroMissoes.data_criacao = dataFormatada;
 
-        res.status(201).json(rows);
+        await Missoes.create(dadosCadastroMissoes);
+
+        res.status(201).send('Cadastrado');
     } catch (error) {
         console.error('Erro ao inserir no banco de dados:', error);
         res.status(500).send('Erro interno do servidor');
@@ -21,7 +22,8 @@ app.post('/missao', async (req, res) => {
 // Rota para listar todas as missões
 app.get('/listaMissao', async (req, res) => {
     try {
-        const [rows] = await pool.execute('SELECT * FROM missoes');
+        const rows = await Missoes.findAll();
+
         res.json(rows);
     } catch (error) {
         console.error('Erro ao recuperar dados do banco de dados:', error);
@@ -33,7 +35,8 @@ app.get('/listaMissao', async (req, res) => {
 app.get('/missao/:id', async (req, res) => {
     try {
         const missionId = parseInt(req.params.id);
-        const [rows] = await pool.execute('SELECT * FROM missoes WHERE id=?',[missionId]);
+        const rows = await Missoes.findByPk(missionId)
+
         res.json(rows)
     } catch (error) {
         console.error('Erro ao recuperar dados do banco de dados:', error);
@@ -45,13 +48,17 @@ app.get('/missao/:id', async (req, res) => {
 app.put('/missao/:id', async (req, res) => {
     try {
         const missaoId = parseInt(req.params.id);
-        const { titulo, descricao } = req.body;
+        const dadosAtualizarMissoes = req.body;
         const dataAtual = new Date().toISOString();
+        const dataFormatada = dataAtual.split('T')[0];
+        dadosAtualizarMissoes.data = dataFormatada;
 
-        const [rows] = await pool.execute(
-            'UPDATE missoes SET titulo=?, descricao=?, data=? WHERE id=?',
-            [titulo, descricao, dataAtual, missaoId]
-        );
+        await Missoes.update(dadosAtualizarMissoes, {
+            where: {
+                id: missaoId
+            }
+        });
+
         res.status(200).send('Atualizado');
     } catch (error) {
         console.error('Erro ao atualizar no banco de dados:', error);
@@ -63,9 +70,12 @@ app.put('/missao/:id', async (req, res) => {
 app.delete('/missao/:id', async (req, res) => {
     try {
         const missaoId = parseInt(req.params.id);
-        const [rows] = await pool.execute(
-            'DELETE FROM missoes WHERE id = ?', [missaoId]
-        );
+
+        await Missoes.destroy({
+            where: {
+                id: missaoId
+            }
+        });
         
         res.status(200).send('Missao Deletada')
     } catch (error) {

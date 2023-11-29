@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "mysql2": "^3.6.4",
+    "sequelize": "^6.35.1",
     "uuid": "^9.0.1"
   }
 }
