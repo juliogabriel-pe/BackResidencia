@@ -2,24 +2,55 @@ const express = require("express");
 const app = express();
 // const pool = require('../../dataBase/connection');
 const Missoes = require('../../models/missoes');
+const Usuario = require('../../models/usuario')
 
-app.post('/missao', async (req, res) => {
+// app.post('/missao', async (req, res) => {
+//     const { usuario_id, dadosMissao } = req.body;
+
+//     try {
+//         // Verifica se o usuário existe antes de associar a missão a ele
+//         const usuario = await Usuario.findByPk(usuario_id);
+//         if (!usuario) {
+//             return res.status(404).json({ message: 'Usuário não encontrado' });
+//         }
+
+//         // Adiciona o ID do usuário aos dados da missão
+//         dadosMissao.usuario_id = usuario_id;
+
+//         // Cria a nova missão associada ao usuário
+//         const novaMissao = await Missoes.create(dadosMissao);
+
+//         res.status(201).json(novaMissao);
+//     } catch (error) {
+//         console.error('Erro ao criar missão associada ao usuário:', error);
+//         res.status(500).send('Erro interno do servidor');
+//     }
+// });
+
+app.post('/missao/:usuarioId', async (req, res) => {
+    const { usuarioId } = req.params;
+    const { dadosMissao } = req.body;
+
     try {
-        const dadosCadastroMissoes = req.body;
-        const dataAtual = new Date().toISOString();
-        const dataFormatada = dataAtual.split('T')[0];
-        dadosCadastroMissoes.data_criacao = dataFormatada;
+        // Verifica se o usuário existe antes de associar a missão a ele
+        const usuario = await Usuario.findByPk(usuarioId);
+        if (!usuario) {
+            return res.status(404).json({ message: 'Usuário não encontrado' });
+        }
 
-        await Missoes.create(dadosCadastroMissoes);
+        // Adiciona o ID do usuário aos dados da missão
+        dadosMissao.usuario_id = usuarioId;
 
-        res.status(201).send('Cadastrado');
+        // Cria a nova missão associada ao usuário
+        const novaMissao = await Missoes.create(dadosMissao);
+
+        res.status(201).json(novaMissao);
     } catch (error) {
-        console.error('Erro ao inserir no banco de dados:', error);
+        console.error('Erro ao criar missão associada ao usuário:', error);
         res.status(500).send('Erro interno do servidor');
     }
-    });
+});
 
-// Rota para listar todas as missões
 app.get('/listaMissao', async (req, res) => {
     try {
         const rows = await Missoes.findAll();

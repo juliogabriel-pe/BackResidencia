@@ -55,7 +55,3 @@ app.get('/negociador', isNegociador, (req, res) => {
 app.get('/home', (req, res) => {
   res.send('Home');
 });
-
-app.listen(3000, () => {
-  console.log('Servidor em execução na porta 3000');
-});

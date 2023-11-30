@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../dataBase/sequelize');
+const Usuario = require("./usuario")
 
 const Missoes = sequelize.define('missao', {
   // Defina os atributos do modelo aqui
@@ -67,8 +68,12 @@ const Missoes = sequelize.define('missao', {
         type: DataTypes.STRING,
         allowNull: false,
 },
-}, {
-  tableName: 'missoes' // Substitua pelo nome da tabela existente no seu banco de dados
+},
+
+{
+    timestamps: false
 });
+
+Missoes.belongsTo(Usuario, { foreignKey: 'usuario_id' });
 
 module.exports = Missoes;
