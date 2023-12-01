@@ -1,8 +1,8 @@
 const express = require("express");
 const app = express();
 // const pool = require('../../dataBase/connection');
-const Missoes = require('../../models/missoes');
-const Usuario = require('../../models/usuario')
+const Missoes = require('../../models/missoes.js');
+const Usuario = require('../../models/usuario.js')
 
 // app.post('/missao', async (req, res) => {
 //     const { usuario_id, dadosMissao } = req.body;
@@ -29,7 +29,11 @@ const Usuario = require('../../models/usuario')
 
 app.post('/missao/:usuarioId', async (req, res) => {
     const { usuarioId } = req.params;
-    const { dadosMissao } = req.body;
+    const dadosMissao = req.body;
+
+    const dataAtual = new Date().toISOString();
+    const dataFormatada = dataAtual.split('T')[0];
+    dadosMissao.data_criacao = dataFormatada;
 
     try {
         // Verifica se o usuário existe antes de associar a missão a ele

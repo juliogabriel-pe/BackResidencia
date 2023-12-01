@@ -2,7 +2,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../dataBase/sequelize');
 const Usuario = require("./usuario")
 
-const Missoes = sequelize.define('missao', {
+const Missoes = sequelize.define('missoes', {
   // Defina os atributos do modelo aqui
     data_criacao: {
         type: DataTypes.STRING,
@@ -71,6 +71,7 @@ const Missoes = sequelize.define('missao', {
 },
 
 {
+    tableName: 'missoes',
     timestamps: false
 });
 
