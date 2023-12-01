@@ -1,39 +1,50 @@
 const express = require('express');
 const Usuario = require('../../models/usuario');
+const bcrypt = require('bcrypt');
 
 const app = express();
 
 app.post('/login', async (req, res) => {
     try {
-        // Valide os dados de login
-
-        // Encontre o usuário no banco de dados
+        // Encontre o usuário pelo e-mail
         const usuario = await Usuario.findOne({
-            where: { email: req.body.email, senha: req.body.senha },
+            where: {
+                email: req.body.email,
+            },
         });
 
+        // Verifique se o usuário foi encontrado
         if (!usuario) {
             return res.status(401).json({ error: 'Credenciais inválidas' });
         }
 
-        // Retorne o usuário, incluindo o tipo de usuário
-        res.status(200).json({
-            id: usuario.id,
-            nome: usuario.nome,
-            tipoUsuario: usuario.tipoUsuario,
-        });
+        // Compare a senha fornecida com o hash armazenado
+        const senhaCorrespondente = await bcrypt.compare(req.body.senha, usuario.senha);
+
+        // Verifique se a senha corresponde
+        if (!senhaCorrespondente) {
+            return res.status(401).json({ error: 'Credenciais inválidas' });
+        }
+
+        res.status(200).json({ message: 'Login bem-sucedido', usuario });
     } catch (error) {
-        console.error(error);
+        console.error('Erro ao autenticar o usuário:', error);
         res.status(500).json({ error: 'Erro interno do servidor' });
     }
 });
 
 // Rota para criar um novo usuário
 app.post('/usuarios', async (req, res) => {
-    try {
-        console.log('Criando um novo usuário...');
+    try {        
+        // Hash da senha antes de criar o usuário
+        const senhaHash = await bcrypt.hash(req.body.senha, 10);
+
+        // Substitua a senha no corpo da requisição pelo hash
+        req.body.senha = senhaHash;
+
+        // Crie o novo usuário com a senha em hash
         const novoUsuario = await Usuario.create(req.body);
-        console.log('Novo usuário criado:', novoUsuario);
+
         res.status(201).json(novoUsuario);
     } catch (error) {
         console.error('Erro ao criar um novo usuário:', error);
