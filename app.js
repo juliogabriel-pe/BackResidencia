@@ -1,11 +1,10 @@
 const express = require('express');
 const app = express();
 // const { v4: uuidv4 } = require('uuid');
-const conexao = require('./dataBase/sequelize.js')
-const Usuario = require('./models/usuario.js')
-const Missoes = require('./models/missoes.js')
-const controller = require("./Controller/Missao/missaoController.js")
-const usuarioController = require("./Controller/Usuario/usuarioController.js")
+const conexao = require('./dataBase/sequelize.js');
+const controller = require("./Controller/Missao/missaoController.js");
+const controllerUsuario = require("./Controller/Usuario/usuarioController.js");
+const { authRouter } = require('./auth.js');
 
 app.use(express.json());
 
@@ -23,7 +22,17 @@ conexao
     console.log('Erro de conexão:', error);
 });
 
-app.use("/", controller ,usuarioController);
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    if (req.method === 'OPTIONS') {
+        res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
+        return res.status(200).json({});
+    }
+    next();
+});
+
+app.use("/", controller ,authRouter, controllerUsuario);
 
 
 const port = process.env.PORT || 8080;
