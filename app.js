@@ -22,6 +22,12 @@ conexao
     console.log('Erro de conexão:', error);
 });
 
+sequelize.sync({ force: true }).then(() => {
+    console.log('Modelos sincronizados com o banco de dados');
+}).catch((err) => {
+    console.error('Erro ao sincronizar modelos:', err);
+});
+
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
