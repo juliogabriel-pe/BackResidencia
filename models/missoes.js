@@ -61,7 +61,7 @@ const Missoes = sequelize.define('missoes', {
         allowNull: false,
 },
     rascunho: {
-        type: DataTypes.TINYINT,
+        type: DataTypes.INTEGER,
         allowNull: false,
 },
     progresso_avaliacao: {
