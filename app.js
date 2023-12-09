@@ -22,7 +22,7 @@ conexao
     console.log('Erro de conexão:', error);
 });
 
-sequelize.sync({ force: true }).then(() => {
+conexao.sync({ force: true }).then(() => {
     console.log('Modelos sincronizados com o banco de dados');
 }).catch((err) => {
     console.error('Erro ao sincronizar modelos:', err);
